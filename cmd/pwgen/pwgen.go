@@ -1,3 +1,4 @@
+// main provides a brief example of using the pwgen library
 package main
 
 import (
