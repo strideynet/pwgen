@@ -2,6 +2,7 @@ package pwgen
 
 import (
 	"errors"
+	"strings"
 )
 
 type settings struct {
@@ -13,6 +14,13 @@ type settings struct {
 }
 
 type option func(*settings)
+
+var (
+	lowercaseLetters = "abcdefghijklmnopqrstuvwxyz"
+	uppercaseLetters = strings.ToUpper(lowercaseLetters)
+	numbers          = "0123456789"
+	specials         = "@%!?*^&"
+)
 
 // Length specifies the length of the password to return.
 func Length(l int) option {
