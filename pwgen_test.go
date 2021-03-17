@@ -71,7 +71,6 @@ func TestGenerate(t *testing.T) {
 	for _, te := range tt {
 		t.Run(te.Name, func(t *testing.T) {
 			str, err := Generate(te.Options...)
-			fmt.Printf("%s\n", str)
 			// Ensure returned error matches expectations
 			if err != nil {
 				if te.ExpectedError == "" {
@@ -84,6 +83,9 @@ func TestGenerate(t *testing.T) {
 					t.Fatalf("Expected error, got none")
 				}
 			}
+
+			// Ensure correct number of characters are included
+
 		})
 	}
 }

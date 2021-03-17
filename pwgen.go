@@ -89,6 +89,8 @@ func Generate(opts ...Option) (string, error) {
 		opt(s)
 	}
 
+	// do some validation
+
 	minimumLength := s.lowercase + s.number + s.special + s.uppercase
 	if minimumLength > s.length {
 		return "", errors.New("combined minimum lengths cannot exceed specified length")
