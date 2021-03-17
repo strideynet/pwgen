@@ -22,19 +22,19 @@ func main() {
 
 	var opts []pwgen.Option
 	if *length != -1 {
-		opts = append(opts, pwgen.Length(*length))
+		opts = append(opts, pwgen.WithLength(*length))
 	}
 	if *lowercase != -1 {
-		opts = append(opts, pwgen.Lowercase(*lowercase))
+		opts = append(opts, pwgen.WithLowercaseCount(*lowercase))
 	}
 	if *uppercase != -1 {
-		opts = append(opts, pwgen.Uppercase(*uppercase))
+		opts = append(opts, pwgen.WithUppercaseCount(*uppercase))
 	}
 	if *special != -1 {
-		opts = append(opts, pwgen.Special(*special))
+		opts = append(opts, pwgen.WithSpecialCount(*special))
 	}
 	if *number != -1 {
-		opts = append(opts, pwgen.Number(*number))
+		opts = append(opts, pwgen.WithNumberCount(*number))
 	}
 
 	str, err := pwgen.Generate(opts...)

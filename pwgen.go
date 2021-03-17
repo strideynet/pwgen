@@ -29,36 +29,36 @@ var (
 	allCharacters       = lowercaseCharacters + uppercaseCharacters + numberCharacters + specialCharacters
 )
 
-// Length specifies the length of the password to return.
-func Length(l int) Option {
+// WithLength specifies the length of the password to return.
+func WithLength(l int) Option {
 	return func(s *settings) {
 		s.length = l
 	}
 }
 
-// Lowercase specifies the minimum number of lowercase characters to include.
-func Lowercase(l int) Option {
+// WithLowercaseCount specifies the minimum number of lowercase characters to include.
+func WithLowercaseCount(l int) Option {
 	return func(s *settings) {
 		s.lowercase = l
 	}
 }
 
-// Uppercase specifies the minimum number of uppercase characters to include.
-func Uppercase(l int) Option {
+// WithUppercaseCount specifies the minimum number of uppercase characters to include.
+func WithUppercaseCount(l int) Option {
 	return func(s *settings) {
 		s.uppercase = l
 	}
 }
 
-// Number specifies the minimum number of numbers to include.
-func Number(l int) Option {
+// WithNumberCount specifies the minimum number of numbers to include.
+func WithNumberCount(l int) Option {
 	return func(s *settings) {
 		s.number = l
 	}
 }
 
-// Special sets the minimum number of special characters to include (@%!?*^&).
-func Special(l int) Option {
+// WithSpecialCount sets the minimum number of special characters to include (@%!?*^&).
+func WithSpecialCount(l int) Option {
 	return func(s *settings) {
 		s.special = l
 	}
@@ -89,7 +89,10 @@ func Generate(opts ...Option) (string, error) {
 		opt(s)
 	}
 
-	// do some validation
+	// ensure lengths are valid
+	if s.length < 0 || s.lowercase < 0 || s.uppercase < 0 || s.number < 0 || s.special < 0 {
+		return "", errors.New("a specified minimum character count cant be less than 0")
+	}
 
 	minimumLength := s.lowercase + s.number + s.special + s.uppercase
 	if minimumLength > s.length {
@@ -104,7 +107,7 @@ func Generate(opts ...Option) (string, error) {
 		pickRandomCharacters(allCharacters, s.length-minimumLength) // Top up the character set with all characters to reach requested length
 
 	// Shuffle the string so that there is not a predictable ordering to the characters
-	runeSlice := []rune(combinedSet)
+	runeSlice := []rune(combinedSet) // cast to rune slice, so we can actually swap characters
 	rand.Shuffle(len(combinedSet), func(i, j int) {
 		runeSlice[i], runeSlice[j] = runeSlice[j], runeSlice[i]
 	})

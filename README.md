@@ -27,7 +27,7 @@ if err != nil {
 
 log.Printf("Your password is %s", str)
 
-pwgen.Generate(pwgen.Length(32), pwgen.Lowercase(12)) // Creates a password of length 32, with at least 12 lowercase characters
+pwgen.Generate(pwgen.WithLength(32), pwgen.WithLowercaseCount(12)) // Creates a password of length 32, with at least 12 lowercase characters
 ```
 
 ## Notes

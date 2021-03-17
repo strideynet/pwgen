@@ -1,7 +1,7 @@
 package pwgen
 
 import (
-	"fmt"
+	"strings"
 	"testing"
 )
 
@@ -32,6 +32,17 @@ func Test_pickRandomCharacters(t *testing.T) {
 	}
 }
 
+// counts number of letters in string that belong to a set
+func countSetInString(set string, str string) int {
+	count := 0
+	for _, l := range str {
+		if strings.Contains(set, string(l)) {
+			count++
+		}
+	}
+	return count
+}
+
 func TestGenerate(t *testing.T) {
 	tt := []struct {
 		Name                     string
@@ -53,18 +64,28 @@ func TestGenerate(t *testing.T) {
 		},
 		{
 			Name:          "too long",
-			Options:       []Option{Length(2), Lowercase(16)},
+			Options:       []Option{WithLength(2), WithLowercaseCount(16)},
 			ExpectedError: "combined minimum lengths cannot exceed specified length",
+		},
+		{
+			Name:          "too short",
+			Options:       []Option{WithLength(-12)},
+			ExpectedError: "a specified minimum character count cant be less than 0",
 		},
 		{
 			Name: "hail mary",
 			Options: []Option{
-				Length(33), // one over, so that we get one random letter
-				Lowercase(8),
-				Uppercase(8),
-				Number(8),
-				Special(8),
+				WithLength(33), // one over, so that we get one random letter
+				WithLowercaseCount(8),
+				WithUppercaseCount(8),
+				WithNumberCount(8),
+				WithSpecialCount(8),
 			},
+			ExpectedLength:           33,
+			ExpectedMinimumLowercase: 8,
+			ExpectedMinimumUppercase: 8,
+			ExpectedMinimumNumbers:   8,
+			ExpectedMinimumSpecial:   8,
 		},
 	}
 
@@ -78,6 +99,7 @@ func TestGenerate(t *testing.T) {
 				} else if te.ExpectedError != err.Error() {
 					t.Fatalf("Expected error '%s', got '%s'", te.ExpectedError, err)
 				}
+				return
 			} else {
 				if te.ExpectedError != "" {
 					t.Fatalf("Expected error, got none")
@@ -85,7 +107,29 @@ func TestGenerate(t *testing.T) {
 			}
 
 			// Ensure correct number of characters are included
+			if te.ExpectedLength != len(str) {
+				t.Errorf("expected length %d, got %d", te.ExpectedLength, len(str))
+			}
 
+			lowerCount := countSetInString(lowercaseCharacters, str)
+			if lowerCount < te.ExpectedMinimumLowercase {
+				t.Errorf("expected at least %d lowercase characters, got %d", te.ExpectedMinimumLowercase, lowerCount)
+			}
+
+			upperCount := countSetInString(uppercaseCharacters, str)
+			if upperCount < te.ExpectedMinimumUppercase {
+				t.Errorf("expected at least %d uppercase characters, got %d", te.ExpectedMinimumUppercase, upperCount)
+			}
+
+			specialCount := countSetInString(specialCharacters, str)
+			if specialCount < te.ExpectedMinimumSpecial {
+				t.Errorf("expected at least %d specialcase characters, got %d", te.ExpectedMinimumSpecial, specialCount)
+			}
+
+			numberCount := countSetInString(numberCharacters, str)
+			if numberCount < te.ExpectedMinimumNumbers {
+				t.Errorf("expected at least %d number characters, got %d", te.ExpectedMinimumNumbers, numberCount)
+			}
 		})
 	}
 }
