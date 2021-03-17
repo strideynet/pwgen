@@ -19,7 +19,7 @@ type settings struct {
 	uppercase int
 }
 
-type option func(*settings)
+type Option func(*settings)
 
 var (
 	lowercaseCharacters = "abcdefghijklmnopqrstuvwxyz"
@@ -30,35 +30,35 @@ var (
 )
 
 // Length specifies the length of the password to return.
-func Length(l int) option {
+func Length(l int) Option {
 	return func(s *settings) {
 		s.length = l
 	}
 }
 
 // Lowercase specifies the minimum number of lowercase characters to include.
-func Lowercase(l int) option {
+func Lowercase(l int) Option {
 	return func(s *settings) {
 		s.lowercase = l
 	}
 }
 
 // Uppercase specifies the minimum number of uppercase characters to include.
-func Uppercase(l int) option {
+func Uppercase(l int) Option {
 	return func(s *settings) {
 		s.uppercase = l
 	}
 }
 
 // Number specifies the minimum number of numbers to include.
-func Number(l int) option {
+func Number(l int) Option {
 	return func(s *settings) {
 		s.number = l
 	}
 }
 
 // Special sets the minimum number of special characters to include (@%!?*^&).
-func Special(l int) option {
+func Special(l int) Option {
 	return func(s *settings) {
 		s.special = l
 	}
@@ -73,7 +73,9 @@ func pickRandomCharacters(set string, count int) string {
 	return str
 }
 
-func Generate(opts ...option) (string, error) {
+// Generates creates a password as a string using the options specified. It may return an error when an invalid config is provided.
+// By default, the password includes 8 characters, 2 lowercase, 2 uppercase, 2 numbers and 2 specials.
+func Generate(opts ...Option) (string, error) {
 	// start with default settings values
 	s := &settings{
 		length:    8,
@@ -92,12 +94,14 @@ func Generate(opts ...option) (string, error) {
 		return "", errors.New("combined minimum lengths cannot exceed specified length")
 	}
 
+	// Produce an overall set of the characters in the password
 	combinedSet := pickRandomCharacters(lowercaseCharacters, s.lowercase) +
 		pickRandomCharacters(uppercaseCharacters, s.uppercase) +
 		pickRandomCharacters(numberCharacters, s.number) +
 		pickRandomCharacters(specialCharacters, s.special) +
 		pickRandomCharacters(allCharacters, s.length-minimumLength) // Top up the character set with all characters to reach requested length
 
+	// Shuffle the string so that there is not a predictable ordering to the characters
 	runeSlice := []rune(combinedSet)
 	rand.Shuffle(len(combinedSet), func(i, j int) {
 		runeSlice[i], runeSlice[j] = runeSlice[j], runeSlice[i]

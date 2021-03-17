@@ -4,12 +4,16 @@ package main
 import (
 	"github.com/strideynet/pwgen"
 	"log"
+	"os"
 )
 
 func main() {
-	str, err := pwgen.Generate(pwgen.Number(12), pwgen.Length(18))
+	log.Printf("Generating a password!")
+
+	str, err := pwgen.Generate(pwgen.Number(12), pwgen.Length(2))
 	if err != nil {
-		log.Panicf("By golly, an error occured: %s", err)
+		log.Printf("By golly, an error occured: %s", err)
+		os.Exit(1)
 	}
 
 	log.Printf("The generated password is: %s", str)
