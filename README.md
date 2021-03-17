@@ -1,6 +1,8 @@
 # pwgen
 
-Go password generation library (codetest)
+[![Go Reference](https://pkg.go.dev/badge/github.com/strideynet/pwgen.svg)](https://pkg.go.dev/github.com/strideynet/pwgen)
+
+Go password generation library (codetest).
 
 ## CLI usage
 
@@ -29,6 +31,8 @@ log.Printf("Your password is %s", str)
 
 pwgen.Generate(pwgen.WithLength(32), pwgen.WithLowercaseCount(12)) // Creates a password of length 32, with at least 12 lowercase characters
 ```
+
+Checkout the docs at https://pkg.go.dev/github.com/strideynet/pwgen
 
 ## Notes
 
