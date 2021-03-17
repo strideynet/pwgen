@@ -2,8 +2,14 @@ package pwgen
 
 import (
 	"errors"
+	"math/rand"
 	"strings"
+	"time"
 )
+
+func init() {
+	rand.Seed(time.Now().Unix())
+}
 
 type settings struct {
 	length    int
@@ -16,10 +22,11 @@ type settings struct {
 type option func(*settings)
 
 var (
-	lowercaseLetters = "abcdefghijklmnopqrstuvwxyz"
-	uppercaseLetters = strings.ToUpper(lowercaseLetters)
-	numbers          = "0123456789"
-	specials         = "@%!?*^&"
+	lowercaseCharacters = "abcdefghijklmnopqrstuvwxyz"
+	uppercaseCharacters = strings.ToUpper(lowercaseCharacters)
+	numberCharacters    = "0123456789"
+	specialCharacters   = "@%!?*^&"
+	allCharacters       = lowercaseCharacters + uppercaseCharacters + numberCharacters + specialCharacters
 )
 
 // Length specifies the length of the password to return.
@@ -57,6 +64,15 @@ func Special(l int) option {
 	}
 }
 
+// pickRandomCharacters picks a count of random characters from a string
+func pickRandomCharacters(set string, count int) string {
+	str := ""
+	for i := 0; i < count; i++ {
+		str += string(set[rand.Intn(len(set))])
+	}
+	return str
+}
+
 func Generate(opts ...option) (string, error) {
 	// start with default settings values
 	s := &settings{
@@ -76,5 +92,16 @@ func Generate(opts ...option) (string, error) {
 		return "", errors.New("combined minimum lengths cannot exceed specified length")
 	}
 
-	return "", nil
+	combinedSet := pickRandomCharacters(lowercaseCharacters, s.lowercase) +
+		pickRandomCharacters(uppercaseCharacters, s.uppercase) +
+		pickRandomCharacters(numberCharacters, s.number) +
+		pickRandomCharacters(specialCharacters, s.special) +
+		pickRandomCharacters(allCharacters, s.length-minimumLength) // Top up the character set with all characters to reach requested length
+
+	runeSlice := []rune(combinedSet)
+	rand.Shuffle(len(combinedSet), func(i, j int) {
+		runeSlice[i], runeSlice[j] = runeSlice[j], runeSlice[i]
+	})
+
+	return string(runeSlice), nil
 }
